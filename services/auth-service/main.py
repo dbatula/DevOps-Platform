@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI # type: ignore
+from pydantic import BaseModel # type: ignore
 from auth import hash_password, verify_password, create_token
 
 app = FastAPI()
