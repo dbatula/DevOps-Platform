@@ -42,4 +42,3 @@ def get_order(order_id: int):
 @app.get("/orders")
 def get_orders():
     return list(orders_db.values())
-
