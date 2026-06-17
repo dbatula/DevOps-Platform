@@ -1,0 +1,53 @@
+#version: "5.1"
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/POSTGRES_USER_FILE
+      POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASSWORD_FILE
+      POSTGRES_DB_FILE: /run/secrets/POSTGRES_DB_FILE
+    secrets:
+      - POSTGRES_USER_FILE
+      - POSTGRES_PASSWORD_FILE
+      - POSTGRES_DB_FILE
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      - postgres
+
+secrets:
+   POSTGRES_USER_FILE:
+     file: docker-compose-secrets.env
+   POSTGRES_PASSWORD_FILE:
+     file: docker-compose-secrets.env
+   POSTGRES_DB_FILE:
+     file: docker-compose-secrets.env
+
+volumes:
+  postgres_data:
