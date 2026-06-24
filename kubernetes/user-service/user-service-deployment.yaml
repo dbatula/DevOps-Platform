@@ -18,9 +18,9 @@ spec:
         image: ngcicd/user-service:v1
         envFrom:
         - configMapRef:
-            name: user-service-configmap
+            name: global-configmap
         - secretRef:
-            name: user-service-secret
+            name: global-secret
         resources:
           requests:
             memory: "128Mi"
@@ -43,3 +43,4 @@ spec:
   ports:
   - port: 8001
     targetPort: 8001
+    nodePort: 30001
