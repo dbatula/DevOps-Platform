@@ -2,3 +2,5 @@ fastapi
 uvicorn
 pyjwt
 passlib[bcrypt]
+sqlalchemy
+psycopg2-binary
