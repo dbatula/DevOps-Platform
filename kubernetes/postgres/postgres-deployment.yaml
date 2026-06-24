@@ -17,26 +17,14 @@ spec:
       - name: postgres
         image: postgres:17
         envFrom:
-        - configMapRef:
-            name: postgres-configmap
         - secretRef:
-            name: postgres-secret
-        # env:
-        # - name: POSTGRES_USER
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: postgres-secret
-        #       key: POSTGRES_USER
-        # - name: POSTGRES_PASSWORD
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: postgres-secret
-        #       key: POSTGRES_PASSWORD
-        # - name: POSTGRES_DB
-        #   valueFrom:
-        #     configMapKeyRef:
-        #       name: postgres-configmap
-        #       key: POSTGRES_DB
+            name: global-secret
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: global-configmap
+              key: POSTGRES_DB
         resources:
           requests:
             memory: "128Mi"
@@ -53,5 +41,16 @@ spec:
       - name: postgres-data
         persistentVolumeClaim:
           claimName: postgres-pvc
-      
-        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: devops-platform
+spec:
+  selector:
+    app: postgres
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
