@@ -1,6 +1,6 @@
-from fastapi import Depends, FastAPI, HTTPException
-from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from fastapi import Depends, FastAPI, HTTPException # type: ignore
+from pydantic import BaseModel # type: ignore
+from sqlalchemy.orm import Session # type: ignore
 
 from database import SessionLocal, engine
 from models import Base, OrderDB

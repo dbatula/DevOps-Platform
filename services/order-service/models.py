@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String # type: ignore
+from sqlalchemy.orm import declarative_base # type: ignore
 
 Base = declarative_base()
 
