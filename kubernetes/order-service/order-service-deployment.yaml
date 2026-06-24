@@ -16,6 +16,11 @@ spec:
       containers:
       - name: order-service
         image: ngcicd/order-service:v1
+        envFrom:
+        - configMapRef:
+            name: global-configmap
+        - secretRef:
+            name: global-secret
         resources:
           requests:
             memory: "128Mi"
