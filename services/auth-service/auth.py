@@ -10,11 +10,21 @@ pwd_context = CryptContext(
     deprecated="auto"
 )
 
+def _safe_password(password: str) -> str:
+    if password is None:
+        return ""
+    return password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
+
+
 def hash_password(password: str):
-    return pwd_context.hash(password)
+    safe_password = _safe_password(password)
+    return pwd_context.hash(safe_password)
+
 
 def verify_password(password, hashed):
-    return pwd_context.verify(password, hashed)
+    safe_password = _safe_password(password)
+    return pwd_context.verify(safe_password, hashed)
+
 
 def create_token(data: dict):
     payload = data.copy()
