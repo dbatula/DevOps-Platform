@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: devops-platform-ingress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: devops-platform-ingress
+spec:
+  rules:
+
+  - host: {{.Values.ingress.host}}
+    http:
+      paths:
+
+      - pathType: Prefix
+        path: "/auth"
+        backend:
+          service:
+            name: auth
+            port: 
+              number: {{.Values.services.auth.port}}
+
+      - pathType: Prefix
+        path: "/users"
+        backend:
+          service:
+            name: user
+            port: 
+              number: {{.Values.services.user.port}}
+
+      - pathType: Prefix
+        path: "/orders"
+        backend:
+          service:
+            name: order
+            port: 
+              number: {{.Values.services.order.port}}

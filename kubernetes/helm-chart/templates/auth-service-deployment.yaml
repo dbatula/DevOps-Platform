@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  replicas: {{.Values.services.auth.replicas}}
+
+  selector:
+    matchLabels:
+      app: auth
+
+  template:
+    metadata:
+      labels:
+        app: auth
+
+    spec:
+      containers:
+      - name: auth
+        image: {{.Values.services.auth.image}}
+
+        envFrom:
+        - configMapRef:
+            name: {{.Values.global.envFrom.configMap}}
+        - secretRef:
+            name: {{.Values.global.envFrom.secret}}
+
+        resources:
+          requests:
+            memory: {{.Values.services.auth.resources.requests.memory}}
+            cpu: {{.Values.services.auth.resources.requests.cpu}}
+          limits:
+            memory: {{.Values.services.auth.resources.limits.memory}}
+            cpu: {{.Values.services.auth.resources.limits.cpu}}
+
+        ports:
+        - containerPort: {{.Values.services.auth.port}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  selector:
+    app: auth
+
+  ports:
+  - port: {{.Values.services.auth.port}}
+    targetPort: {{.Values.services.auth.port}}

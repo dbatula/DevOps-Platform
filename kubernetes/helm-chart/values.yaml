@@ -1,0 +1,70 @@
+global:
+  namespace: devops-platform
+
+  envFrom:
+    configMap: global-configmap
+    secret: global-secret
+
+  postgres:
+    host: postgres-service
+    port: 5432
+    db: microservices
+    user: devops
+    password: devops
+
+  pvc:
+    volumeMode: Filesystem
+    accessModes:
+      - ReadWriteOnce
+    storage: 5Gi
+
+services:
+  postgres:
+    image: postgres:17
+    replicas: 1
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+  auth:
+    image: ngcicd/auth-service:v0.1.1
+    port: 8000
+    replicas: 1
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+  user:
+    image: ngcicd/user-service:v1
+    port: 8001
+    replicas: 1
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+  order:
+    image: ngcicd/order-service:v1
+    port: 8002
+    replicas: 1
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+
+ingress:
+  host: devops.local

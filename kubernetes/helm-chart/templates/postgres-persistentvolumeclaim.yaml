@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  resources:
+    requests:
+      storage: {{.Values.global.pvc.storage}}
+
+  volumeMode: {{.Values.global.pvc.volumeMode}}
+
+  accessModes:
+    {{.Values.global.pvc.accessModes}}
