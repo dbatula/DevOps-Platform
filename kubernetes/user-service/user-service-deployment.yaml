@@ -39,8 +39,7 @@ metadata:
 spec:
   selector:
     app: user-service
-  type: NodePort
+  type: ClusterIP
   ports:
   - port: 8001
     targetPort: 8001
-    nodePort: 30001
