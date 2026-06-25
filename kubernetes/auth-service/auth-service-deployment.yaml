@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: ngcicd/auth-service:v1
+        image: ngcicd/auth-service:v0.1.1
         envFrom:
         - configMapRef:
             name: global-configmap

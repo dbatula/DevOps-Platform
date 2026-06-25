@@ -29,7 +29,7 @@ def health():
     return {"status": "auth service is running"}
 
 
-@app.post("/register")
+@app.post("/auth/register")
 def register(user: User, db: Session = Depends(get_db)):
     existing = db.query(UserDB).filter(UserDB.email == user.email).first()
 
@@ -46,7 +46,7 @@ def register(user: User, db: Session = Depends(get_db)):
     return {"message": "user created"}
 
 
-@app.post("/login")
+@app.post("/auth/login")
 def login(user: User, db: Session = Depends(get_db)):
     db_user = db.query(UserDB).filter(UserDB.email == user.email).first()
 
