@@ -1,9 +1,84 @@
+############################################
+# Manual
+
 *.env
 *.envrc
 
+############################################
 # Terraform
+
 .terraform/
 *.tfstate
 *.tfstate.*
 .terraform.lock.hcl
 crash.log
+crash.*.log
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+terraform.tfvars
+terraform.tfvars.json
+
+############################################
+# Python
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+.venv/
+venv/
+ENV/
+env/
+
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+############################################
+# VS Code
+
+
+.vscode/
+
+############################################
+# Kubernetes
+
+*.kubeconfig
+kubeconfig
+
+############################################
+# Helm
+
+*.tgz
+charts/
+
+############################################
+# Secrets
+
+.env
+.env.*
+
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+############################################
+# AWS
+
+.aws/
+
+############################################
+# Temporary
+
+tmp/
+temp/
+
+############################################
