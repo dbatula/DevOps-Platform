@@ -1,0 +1,17 @@
+controller:
+  admin:
+    username: devops-platform
+    password: admin123
+
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - docker-workflow
+    - configuration-as-code
+
+  serviceType: LoadBalancer
+
+  persistence:
+    enabled: true
+    size: 5Gi
