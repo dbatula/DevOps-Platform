@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-jcasc
+  labels:
+    app.kubernetes.io/name: jenkins
+    app.kubernetes.io/instance: {{ .Release.Name }}
+
+data:
+{{ (.Files.Glob "jcasc/*.yaml").AsConfig | indent 2 }}

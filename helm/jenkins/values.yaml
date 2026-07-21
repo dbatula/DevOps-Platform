@@ -1,17 +1,116 @@
+# Will be used for the Jenkins Deployment (K8s)-(charts/jenkins-5.8.55.tgz)
+# Default values in the file (https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/values.yaml)
+# В нем описывается сам Helm-чарт:
+
+# образ Jenkins;
+# версия;
+# ingress;
+# persistent volume;
+# ресурсы;
+# плагины;
+# JCasC.
+
+fullnameOverride: jenkins
+
 controller:
+  image:
+    registry: docker.io
+    repository: jenkins/jenkins
+    tag: lts-jdk21
+
   admin:
     username: devops-platform
-    password: admin123
+    password: devops-platform
+  
+  JCasC:
+    # Use our custom JCasC configuration instead of the chart's default one.
+    defaultConfig: false
+    # Always overwrite existing JCasC files to keep Jenkins fully managed by the configuration stored in this repository.
+    overwriteConfiguration: true
+
+  extraVolumes:
+    - name: jcasc
+      configMap:
+        name: jenkins-jcasc
+
+  extraVolumeMounts:
+    - name: jcasc
+      mountPath: /var/jenkins_home/casc_configs
+      readOnly: true
+
+  containerEnv:
+    - name: CASC_JENKINS_CONFIG
+      value: /var/jenkins_home/casc_configs
+
+  serviceType: LoadBalancer
+
+  installLatestPlugins: false
 
   installPlugins:
     - kubernetes
     - workflow-aggregator
     - git
-    - docker-workflow
+    - github
     - configuration-as-code
+    - docker-workflow
+    - credentials
+    - pipeline-stage-view
+    - blueocean
+    - amazon-ecr
+    - aws-credentials
 
-  serviceType: LoadBalancer
+  numExecutors: 0
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+
+    limits:
+      cpu: "2"
+      memory: "4Gi"
 
   persistence:
     enabled: true
-    size: 5Gi
+    storageClass: gp2
+    size: 15Gi
+  
+  env:
+    - name: JENKINS_ADMIN_USERNAME
+      value: admin
+    - name: JENKINS_ADMIN_PASSWORD
+      value: S3cretAdmin
+
+    - name: JENKINS_AGENT_USERNAME
+      value: agentuser
+    - name: JENKINS_AGENT_PASSWORD
+      value: AgentPass123
+
+    - name: GITHUB_USERNAME
+      value: dbatula
+    - name: GITHUB_TOKEN
+      value: ghp_...
+
+    - name: DOCKERHUB_USERNAME
+      value: dockeruser
+    - name: DOCKERHUB_PASSWORD
+      value: dockerpass
+
+    - name: AWS_ACCESS_KEY_ID
+      value: AKIA...
+    - name: AWS_SECRET_ACCESS_KEY
+      value: ...
+    - name: JENKINS_URL
+      value: http://jenkins.example.com
+
+agent:
+  enabled: true
+
+  resources:
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"

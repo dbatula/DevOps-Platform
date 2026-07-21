@@ -1,0 +1,152 @@
+# Configuring Jenkins with Configuration as Code (JCasC) allows you to define the entire configuration of your Jenkins instance in a YAML file. 
+# This approach enables you to version control your Jenkins configuration, making it easier to manage and reproduce across different environments.
+
+# В JCasC можно описать:
+
+# пользователей;
+# права доступа;
+# Security Realm;
+# Authorization;
+# Credentials;
+# Clouds;
+# Nodes;
+# Tools (JDK, Maven и т.д.);
+# System Message;
+# URL Jenkins;
+# Email;
+# Seed Job.
+
+jenkins:
+  systemMessage: |
+    DevOps Platform Jenkins
+    Managed by Jenkins Configuration as Code (JCasC)
+  
+  mode: NORMAL # tell Jenkins to accept any build job assigned to it
+  numExecutors: 0 
+  
+  # Provisioning users
+  securityRealm: # tells Jenkins to configure two users on the controller
+    local:
+      allowsSignup: false # keeps users from being able to create accounts on the controller by visiting ${JENKINS_URL}/signup.
+      users:
+        # Admin user to allow initial login to the controller
+        - id: ${JENKINS_ADMIN_USERNAME}
+          password: ${JENKINS_ADMIN_PASSWORD}
+
+        # Agent user to allow build agents to self-register
+        - id: ${JENKINS_AGENT_USERNAME}
+          password: ${JENKINS_AGENT_PASSWORD}
+        
+        # Want to use the user to show my jenkins pipeline for 3-d people
+        # - id: ${JENKINS_AGENT_USERNAME}
+        #   password: ${JENKINS_AGENT_PASSWORD}
+
+  # Setting roles and permissions
+  # Surprisingly, Jenkins has no support for authorization out of the box; the authorizationStrategy block has just two modes: unsecured, meaning anyone with access to the controller can use it without restriction (i.e., everyone's a fully anonymous administrator), and loggedInUsersCanDoAnything, meaning anyone with an account can act as an administrator. Both are far too permissive to be useful in production, so to secure your controllers properly, you'll need to look to a plugin.
+  # The role-strategy plugin. Docs: https://plugins.jenkins.io/role-strategy/
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+
+          # Define an admin role with full privileges and apply it to the admin user
+          - name: admin
+            permissions:
+              - Overall/Administer
+            entries:
+              - user: ${JENKINS_ADMIN_USERNAME}
+
+          # Define an agent role with narrower privileges (allowing it to connect, self-register, and run builds) and apply it to the agent user
+          - name: agent
+            permissions:
+              - Overall/Read
+              - Agent/Connect
+              - Agent/Disconnect
+              - Agent/Build
+            entries:
+              - user: ${JENKINS_AGENT_USERNAME}
+          
+          # Want to use the user to show my jenkins pipeline for 3-d people
+          # - name: anonymous
+          #   permissions:
+          #     - Overall/Read
+          #   entries:
+          #     - user: anonymous
+  
+  nodes:
+  
+    - permanent:
+        name: agent1
+        launcher: inbound
+        remoteFS: /home/jenkins/agent
+
+    - permanent:
+        name: agent2
+        launcher: inbound
+        remoteFS: /home/jenkins/agent
+
+  jobs:
+    - script: |
+        pipelineJob('devops-platform') {
+            displayName('DevOps Platform')
+            description('CI/CD pipeline for the DevOps Platform repository')
+            definition {
+                cpsScm {
+                    scm {
+                        git {
+                            remote {
+                                url('https://github.com/dbatula/DevOps-Platform.git')
+                                credentials('github-token')
+                            }
+                            branches {
+                                branch('*/dev')
+                            }
+                        }
+                    }
+                    scriptPath('Jenkinsfile')
+                }
+            }
+            triggers {
+                githubPush()
+            }
+        }
+
+  credentials:
+    system:
+      domainCredentials:
+        - credentials:
+            - usernamePassword:
+                scope: GLOBAL
+                id: github-token
+                username: "${GITHUB_USERNAME}"
+                password: "${GITHUB_TOKEN}"
+                description: "GitHub token for DevOps Platform"
+
+            - usernamePassword:
+                scope: GLOBAL
+                id: dockerhub-credentials
+                username: "${DOCKERHUB_USERNAME}"
+                password: "${DOCKERHUB_PASSWORD}"
+                description: "Docker Hub credentials for building and pushing images"
+
+            - usernamePassword:
+                scope: GLOBAL
+                id: aws-credentials
+                username: "${AWS_ACCESS_KEY_ID}"
+                password: "${AWS_SECRET_ACCESS_KEY}"
+                description: "AWS credentials for Terraform and kubectl access"
+
+  labelString: "controller"
+
+  slaveAgentPort: 50000
+
+  disableRememberMe: false
+
+  projectNamingStrategy: "standard"
+
+  markupFormatter:
+    plainText: {}
+
+unclassified:
+  location:
+    url: "${JENKINS_URL}"
